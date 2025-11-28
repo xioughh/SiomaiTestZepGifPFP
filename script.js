@@ -1,17 +1,21 @@
 const CLIENT_ID = "1000000001";
-const REDIRECT_URI = location.origin + "/callback.html";
+const REDIRECT_URI = location.origin + location.pathname.replace(/[^\/]+$/, '') + "callback.html";
 
+let selectedFile = null;
+
+// Login button
 document.getElementById("login-btn")?.addEventListener("click", () => {
-  const authUrl = `https://accounts.zepeto.me/oauth/authorize?client_id=\( {CLIENT_ID}&redirect_uri= \){encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=profile`;
+  const authUrl = `https://id.zepeto.me/oauth/authorize?client_id=\( {CLIENT_ID}&redirect_uri= \){encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=openid+profile+user.info`;
   location.href = authUrl;
 });
 
-// Handle callback after login
+// Handle OAuth callback
 if (location.pathname.includes("callback.html") && location.hash) {
   const token = new URLSearchParams(location.hash.substring(1)).get("access_token");
   if (token) {
     localStorage.setItem("zepeto_token", token);
-    location.href = location.origin;
+    history.replaceState({}, "", location.origin + location.pathname.split("/").pop());
+    location.href = location.origin + location.pathname.replace("callback.html", "");
   }
 }
 
@@ -22,6 +26,7 @@ window.onload = () => {
     document.getElementById("login-screen").classList.remove("hidden");
     return;
   }
+
   document.getElementById("upload-screen").classList.remove("hidden");
 
   const gifInput = document.getElementById("gif-input");
@@ -30,11 +35,47 @@ window.onload = () => {
   const status = document.getElementById("status");
 
   gifInput.onchange = (e) => {
-    const file = e.target.files[0];
-    if (file && file.type === "image/gif") {
-      previewImg.src = URL.createObjectURL(file);
+    selectedFile = e.target.files[0];
+    if (selectedFile && selectedFile.type === "image/gif") {
+      previewImg.src = URL.createObjectURL(selectedFile);
       uploadBtn.disabled = false;
-      selectedFile = file;
+    }
+  };
+
+  uploadBtn.onclick = () => uploadGIF(selectedFile, token, status);
+};
+
+async function uploadGIF(file, token, statusEl) {
+  if (!file) return;
+  statusEl.textContent = "Uploading…";
+  statusEl.style.color = "#fff";
+
+  const form = new FormData();
+  form.append("file", file);
+
+  try {
+    const res = await fetch("https://api-global.zepeto.me/v3/user/me/profile-picture", {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + token,
+        "Origin": "https://id.zepeto.me",
+        "Referer": "https://id.zepeto.me/"
+      },
+      body: form
+    });
+
+    if (res.ok || res.status === 204) {
+      statusEl.textContent = "Success! Refresh Zepeto app now";
+      statusEl.style.color = "#90EE90";
+    } else {
+      statusEl.textContent = "Failed – token expired or Zepeto patched it";
+      statusEl.style.color = "#ff6b6b";
+    }
+  } catch (e) {
+    statusEl.textContent = "Network error – try again";
+    statusEl.style.color = "#ff6b6b";
+  }
+}      selectedFile = file;
     }
   };
 
