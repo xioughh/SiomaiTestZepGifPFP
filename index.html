@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Zepeto GIF PFP • Siomai</title>
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body {font-family:Arial,sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);color:white;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;}
-    .container {padding:20px;max-width:400px;width:90%;}
-    h1 {font-size:2.5rem;margin-bottom:10px;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:Arial,sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);color:white;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;}
+    .container{padding:20px;max-width:400px;width:90%;}
+    h1{font-size:2.5rem;margin-bottom:10px;}
     input,button{width:100%;padding:14px;margin:10px 0;border:none;border-radius:50px;font-size:1.1rem;}
     input{background:rgba(255,255,255,0.2);color:white;}
     button{background:white;color:#667eea;font-weight:bold;cursor:pointer;}
@@ -41,6 +41,7 @@
   </div>
 
   <script>
+    const BACKEND = "https://siomaitestzepgifpfp.onrender.com";
     let file = null;
     const status = document.getElementById("status");
     const status2 = document.getElementById("status2");
@@ -56,7 +57,7 @@
       if (!u || !p) { status.textContent = "Enter username & password"; return; }
       status.textContent = "Logging in...";
 
-      const res = await fetch("https://zepeto-gif-proxy.workers.dev/login", {
+      const res = await fetch(BACKEND + "/login", {
         method: "POST",
         headers: {"Content-Type":"application/json"},
         body: JSON.stringify({username:u,password:p})
@@ -88,7 +89,7 @@
       form.append("token", localStorage.zepeto_token);
       form.append("gif", file);
 
-      const res = await fetch("https://zepeto-gif-proxy.workers.dev/upload", {
+      const res = await fetch(BACKEND + "/upload", {
         method: "POST",
         body: form
       });
