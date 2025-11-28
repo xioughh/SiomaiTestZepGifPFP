@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Zepeto GIF Profile • Upload Animated PFP</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Zepeto GIF Profile</h1>
+    <p>Upload any GIF as your real Zepeto profile picture</p>
+
+    <div id="login-screen">
+      <button id="login-btn">Login with Zepeto</button>
+    </div>
+
+    <div id="upload-screen" class="hidden">
+      <div id="preview-circle">
+        <img id="preview-img" src="" alt="Preview" />
+      </div>
+      <input type="file" id="gif-input" accept=".gif" />
+      <button id="upload-btn" disabled>Upload to Zepeto</button>
+      <p id="status"></p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
