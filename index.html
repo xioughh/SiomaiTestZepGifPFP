@@ -6,43 +6,43 @@
   <title>Zepeto GIF Profile • Siomai</title>
   <style>
     *{margin:0;padding:0;box-sizing:border-box;}
-    body{font-family:Arial,sans-serif;background:#8B5CF6;color:white;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;}
-    .container{padding:20px;max-width:400px;width:90%;}
-    h1{font-size:2.5rem;margin-bottom:10px;}
-    input,button{width:100%;padding:16px;margin:12px 0;border:none;border-radius:50px;font-size:1.1rem;}
-    input{background:rgba(255,255,255,0.15);color:white;border:2px solid transparent;}
-    input:focus{border-color:#fff;outline:none;}
-    button{background:#fff;color:#8B5CF6;font-weight:bold;cursor:pointer;}
+    body{font-family:Arial,sans-serif;background:black;color:white;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;}
+    .container{padding:20px;max-width:350px;width:90%;}
+    h1{font-size:2rem;margin-bottom:20px;color:red;}
+    input{width:100%;padding:15px;margin:10px 0;border:1px solid #333;border-radius:8px;background:#111;color:white;font-size:1rem;}
+    button{width:100%;padding:15px;margin:10px 0;border:none;border-radius:8px;font-size:1rem;font-weight:bold;cursor:pointer;}
+    #login-btn{background:red;color:white;}
+    #upload-btn{background:green;color:white;}
+    #logout-btn{background:#333;color:white;}
     button:disabled{opacity:0.5;cursor:not-allowed;}
-    #preview-circle{width:180px;height:180px;border-radius:50%;overflow:hidden;margin:20px auto;background:#000;}
+    #preview-circle{width:150px;height:150px;border-radius:50%;overflow:hidden;margin:20px auto;background:#000;border:2px solid red;}
     #preview-circle img{width:100%;height:100%;object-fit:cover;}
     .hidden{display:none;}
-    p{margin-top:15px;font-weight:bold;font-size:1.1rem;}
+    p{margin-top:15px;font-weight:bold;}
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Zepeto GIF Profile</h1>
-    <p>Upload animated GIF as your real PFP</p>
 
     <div id="login-screen">
-      <input type="text" id="username" placeholder="Zepeto Username">
+      <input type="text" id="username" placeholder="User ID">
       <input type="password" id="password" placeholder="Password">
-      <button id="login-btn">Login & Continue</button>
+      <button id="login-btn">Login</button>
       <p id="status"></p>
     </div>
 
     <div id="upload-screen" class="hidden">
       <div id="preview-circle"><img id="preview-img" src="" alt="Preview"></div>
       <input type="file" id="gif-input" accept=".gif">
-      <button id="upload-btn" disabled>Upload GIF Now</button>
+      <button id="upload-btn" disabled>Upload GIF</button>
       <p id="status2"></p>
       <button id="logout-btn">Logout</button>
     </div>
   </div>
 
   <script>
-    const BACKEND = "https://api.x-zone.id/zepeto";
+    const BACKEND = "https://tools.x-zone.id";
     let file = null;
     const status = document.getElementById("status");
     const status2 = document.getElementById("status2");
@@ -55,13 +55,13 @@
     document.getElementById("login-btn").onclick = async () => {
       const u = document.getElementById("username").value.trim();
       const p = document.getElementById("password").value;
-      if (!u || !p) { status.textContent = "Enter username & password"; return; }
+      if (!u || !p) { status.textContent = "Enter User ID & password"; return; }
       status.textContent = "Logging in...";
 
-      const res = await fetch(BACKEND + "/login", {
+      const res = await fetch(BACKEND + "/auth/login", {
         method: "POST",
         headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({username:u,password:p})
+        body: JSON.stringify({user_id:u,password:p})
       });
       const data = await res.json();
 
@@ -71,7 +71,7 @@
         document.getElementById("upload-screen").classList.remove("hidden");
         status.textContent = "Login success! Choose GIF";
       } else {
-        status.textContent = data.message || "Wrong username/password";
+        status.textContent = data.message || "Wrong User ID/password";
       }
     };
 
@@ -85,20 +85,20 @@
 
     document.getElementById("upload-btn").onclick = async () => {
       if (!file) return;
-      status2.textContent = "Uploading GIF...";
+      status2.textContent = "Uploading...";
       const form = new FormData();
       form.append("token", localStorage.zepeto_token);
       form.append("gif", file);
 
-      const res = await fetch(BACKEND + "/upload", {
+      const res = await fetch(BACKEND + "/upload/gif", {
         method: "POST",
         body: form
       });
       const result = await res.json();
 
       if (result.success) {
-        status2.textContent = "SUCCESS! Refresh Zepeto app now";
-        status2.style.color = "#90EE90";
+        status2.textContent = "SUCCESS! Refresh Zepeto";
+        status2.style.color = "green";
       } else {
         status2.textContent = result.message || "Upload failed";
       }
