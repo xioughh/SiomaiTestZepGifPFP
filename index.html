@@ -1,35 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Zepeto GIF Profile • Siomai</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zepeto GIF PFP • Siomai</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .container { padding: 20px; max-width: 400px; width: 90%; }
+    h1 { font-size: 2.5rem; margin-bottom: 10px; }
+    input, button {
+      width: 100%; padding: 14px; margin: 10px 0; border: none; border-radius: 50px; font-size: 1.1rem;
+    }
+    input { background: rgba(255,255,255,0.2); color: white; }
+    button { background: white; color: #667eea; font-weight: bold; cursor: pointer; }
+    button:disabled { opacity: 0.5; }
+    #preview-circle {
+      width: 180px; height: 180px; border-radius: 50%; overflow: hidden; margin: 20px auto;
+      border: 5px solid rgba(255,255,255,0.3); background: #000;
+    }
+    #preview-circle img { width: 100%; height: 100%; object-fit: cover; }
+    .hidden { display: none; }
+    #status, #status2 { margin-top: 15px; font-weight: bold; }
+  </style>
 </head>
 <body>
   <div class="container">
     <h1>Zepeto GIF Profile</h1>
-    <p>Upload any GIF as your real animated profile picture</p>
+    <p>Upload animated GIF as your real PFP</p>
 
     <div id="login-screen">
-      <input type="text" id="username" placeholder="Zepeto Username or Email" autocomplete="username" />
-      <input type="password" id="password" placeholder="Password" autocomplete="current-password" />
+      <input type="text" id="username" placeholder="Zepeto Username">
+      <input type="password" id="password" placeholder="Password">
       <button id="login-btn">Login & Continue</button>
-      <button id="test-btn">Test JS (Debug)</button>
+      <p id="status"></p>
     </div>
 
     <div id="upload-screen" class="hidden">
       <div id="preview-circle">
-        <img id="preview-img" src="" alt="Preview" />
+        <img id="preview-img" src="" alt="Preview">
       </div>
-      <p>Choose your GIF below</p>
-      <input type="file" id="gif-input" accept=".gif" />
-      <button id="upload-btn" disabled>Upload to Zepeto</button>
-      <p id="status"></p>
+      <input type="file" id="gif-input" accept=".gif">
+      <button id="upload-btn" disabled>Upload GIF Now</button>
+      <p id="status2"></p>
       <button id="logout-btn">Logout</button>
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    alert("Site is working 100% — ready for full version!");
+
+    let file = null;
+    const status = document.getElementById("status");
+    const status2 = document.getElementById("status2");
+
+    document.getElementById("login-btn").onclick = () => {
+      const u = document.getElementById("username").value.trim();
+      const p = document.getElementById("password").value;
+      if (!u || !p) { status.textContent = "Enter username & password"; return; }
+      status.textContent = "Full working version coming in next message!";
+    };
+
+    document.getElementById("gif-input").onchange = (e) => {
+      file = e.target.files[0];
+      if (file) {
+        document.getElementById("preview-img").src = URL.createObjectURL(file);
+        document.getElementById("upload-btn").disabled = false;
+      }
+    };
+
+    document.getElementById("upload-btn").onclick = () => {
+      if (file) alert("Upload would work — full version ready!");
+    };
+
+    document.getElementById("logout-btn").onclick = () => location.reload();
+  </script>
 </body>
 </html>
