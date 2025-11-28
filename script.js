@@ -1,32 +1,17 @@
-const CLIENT_ID = "1000000001";
-const REDIRECT_URI = location.origin + location.pathname.replace(/[^\/]+$/, '') + "callback.html";
-
 let selectedFile = null;
 
-// Login button
-document.getElementById("login-btn")?.addEventListener("click", () => {
-  const authUrl = `https://id.zepeto.me/oauth/authorize?client_id=\( {CLIENT_ID}&redirect_uri= \){encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=openid+profile+user.info`;
-  location.href = authUrl;
-});
-
-// Handle OAuth callback
-if (location.pathname.includes("callback.html") && location.hash) {
-  const token = new URLSearchParams(location.hash.substring(1)).get("access_token");
-  if (token) {
-    localStorage.setItem("zepeto_token", token);
-    history.replaceState({}, "", location.origin + location.pathname.split("/").pop());
-    location.href = location.origin + location.pathname.replace("callback.html", "");
-  }
-}
-
-// Main app
 window.onload = () => {
   const token = localStorage.getItem("zepeto_token");
-  if (!token) {
+  if (token) {
+    document.getElementById("upload-screen").classList.remove("hidden");
+    document.getElementById("login-screen").classList.add("hidden");
+    setupUploadZone();
+  } else {
     document.getElementById("login-screen").classList.remove("hidden");
-    return;
   }
+};
 
+function setupUploadZone() {
   document.getElementById("upload-screen").classList.remove("hidden");
 
   const gifInput = document.getElementById("gif-input");
@@ -42,12 +27,54 @@ window.onload = () => {
     }
   };
 
-  uploadBtn.onclick = () => uploadGIF(selectedFile, token, status);
+  uploadBtn.onclick = () => uploadGIF(selectedFile, status);
+  document.getElementById("logout-btn").onclick = () => {
+    localStorage.removeItem("zepeto_token");
+    location.reload();
+  };
+}
+
+document.getElementById("login-btn").onclick = async () => {
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value;
+  const status = document.getElementById("status");
+
+  if (!username || !password) {
+    status.textContent = "Please enter username and password";
+    return;
+  }
+
+  status.textContent = "Logging in...";
+
+  try {
+    const res = await fetch("https://api-global.zepeto.me/v1/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: username, password: password })
+    });
+
+    const data = await res.json();
+
+    if (data.access_token) {
+      localStorage.setItem("zepeto_token", data.access_token);
+      document.getElementById("login-screen").classList.add("hidden");
+      setupUploadZone();
+      status.textContent = "Login successful! Choose your GIF";
+      status.style.color = "#90EE90";
+    } else {
+      status.textContent = "Wrong username or password";
+      status.style.color = "#ff6b6b";
+    }
+  } catch (e) {
+    status.textContent = "Login failed – check internet";
+    status.style.color = "#ff6b6b";
+  }
 };
 
-async function uploadGIF(file, token, statusEl) {
+async function uploadGIF(file, statusEl) {
   if (!file) return;
-  statusEl.textContent = "Uploading…";
+  const token = localStorage.getItem("zepeto_token");
+  statusEl.textContent = "Uploading your GIF...";
   statusEl.style.color = "#fff";
 
   const form = new FormData();
@@ -56,11 +83,7 @@ async function uploadGIF(file, token, statusEl) {
   try {
     const res = await fetch("https://api-global.zepeto.me/v3/user/me/profile-picture", {
       method: "POST",
-      headers: {
-        "Authorization": "Bearer " + token,
-        "Origin": "https://id.zepeto.me",
-        "Referer": "https://id.zepeto.me/"
-      },
+      headers: { "Authorization": "Bearer " + token },
       body: form
     });
 
@@ -68,37 +91,11 @@ async function uploadGIF(file, token, statusEl) {
       statusEl.textContent = "Success! Refresh Zepeto app now";
       statusEl.style.color = "#90EE90";
     } else {
-      statusEl.textContent = "Failed – token expired or Zepeto patched it";
+      statusEl.textContent = "Upload failed – try logging in again";
       statusEl.style.color = "#ff6b6b";
     }
   } catch (e) {
-    statusEl.textContent = "Network error – try again";
-    statusEl.style.color = "#ff6b6b";
-  }
-}      selectedFile = file;
-    }
-  };
-
-  uploadBtn.onclick = () => uploadGIF(selectedFile, token, status);
-};
-
-let selectedFile;
-async function uploadGIF(file, token, statusEl) {
-  statusEl.textContent = "Uploading...";
-  const form = new FormData();
-  form.append("file", file);
-
-  const res = await fetch("https://api.zepeto.me/v3/user/me/profile-picture", {
-    method: "POST",
-    headers: { "Authorization": "Bearer " + token },
-    body: form
-  });
-
-  if (res.ok) {
-    statusEl.textContent = "Success! Refresh Zepeto app now 🎉";
-    statusEl.style.color = "#90EE90";
-  } else {
-    statusEl.textContent = "Failed – token expired or GIF too big";
+    statusEl.textContent = "Network error";
     statusEl.style.color = "#ff6b6b";
   }
 }
