@@ -3,25 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Zepeto GIF Profile • Upload Animated PFP</title>
+  <title>Zepeto GIF Profile • Siomai</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
     <h1>Zepeto GIF Profile</h1>
-    <p>Upload any GIF as your real Zepeto profile picture</p>
+    <p>Upload any GIF as your real animated profile picture</p>
 
     <div id="login-screen">
-      <button id="login-btn">Login with Zepeto</button>
+      <input type="text" id="username" placeholder="Zepeto Username" autocomplete="username" />
+      <input type="password" id="password" placeholder="Password" autocomplete="current-password" />
+      <button id="login-btn">Login & Continue</button>
     </div>
 
     <div id="upload-screen" class="hidden">
       <div id="preview-circle">
         <img id="preview-img" src="" alt="Preview" />
       </div>
+      <p>Choose your GIF below</p>
       <input type="file" id="gif-input" accept=".gif" />
       <button id="upload-btn" disabled>Upload to Zepeto</button>
       <p id="status"></p>
+      <button id="logout-btn">Logout</button>
     </div>
   </div>
 
